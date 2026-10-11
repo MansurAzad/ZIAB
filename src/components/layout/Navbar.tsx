@@ -91,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
               <div>
                 <span className="font-extrabold tracking-tight text-lg sm:text-xl text-slate-900 dark:text-white block leading-tight">
-                  CITY SQUARE <span className="text-amber-600 dark:text-amber-500">BD</span>
+                  CITY ZONE <span className="text-amber-600 dark:text-amber-500">SQUARE</span>
                 </span>
                 <span className="text-[10px] tracking-wider uppercase font-semibold text-slate-600 dark:text-slate-300 block -mt-0.5">
                   Real Estate & Investment
@@ -100,22 +100,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6">
-            {navLinks.map(link => (
-              <button
-                key={link.id}
-                onClick={() => onNavigate(link.id)}
-                className={`text-sm font-medium transition-colors ${
-                  activeView === link.id
-                    ? 'text-amber-700 dark:text-amber-400 font-semibold'
-                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
-                }`}
-              >
-                {link.label}
-              </button>
-            ))}
-          </nav>
+          {/* Desktop Nav Links - HIDE IN USER DASHBOARD */}
+          {activeView !== 'dashboard' && (
+            <nav className="hidden lg:flex items-center gap-6">
+              {navLinks.map(link => (
+                <button
+                  key={link.id}
+                  onClick={() => onNavigate(link.id)}
+                  className={`text-sm font-medium transition-colors ${
+                    activeView === link.id
+                      ? 'text-amber-700 dark:text-amber-400 font-semibold'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
+                  }`}
+                >
+                  {link.label}
+                </button>
+              ))}
+            </nav>
+          )}
 
           {/* Action Items: Lang, Theme, Sync, Notifications, Glance Widget, Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
@@ -168,67 +170,69 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>Glance</span>
             </button>
 
-            {/* Notification Bell */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setNotificationsOpen(!notificationsOpen);
-                  if (!notificationsOpen && unreadCount > 0) {
-                    onMarkNotificationsRead();
-                  }
-                }}
-                className="relative p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                aria-label="Notifications"
-              >
-                <Bell className="w-4 h-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white dark:ring-slate-900" />
-                )}
-              </button>
+            {/* Notification Bell - REMOVED / HIDDEN IN USER DASHBOARD */}
+            {activeView !== 'dashboard' && (
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setNotificationsOpen(!notificationsOpen);
+                    if (!notificationsOpen && unreadCount > 0) {
+                      onMarkNotificationsRead();
+                    }
+                  }}
+                  className="relative p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  aria-label="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white dark:ring-slate-900" />
+                  )}
+                </button>
 
-              {/* Notification Dropdown */}
-              {notificationsOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
-                  <div className="p-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-                    <span className="font-semibold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
-                      {t('notificationsTitle')}
-                    </span>
-                    <button
-                      onClick={() => setNotificationsOpen(false)}
-                      className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700/50">
-                    {notifications.length === 0 ? (
-                      <div className="p-4 text-center text-xs text-slate-500">
-                        {t('noNotifications')}
-                      </div>
-                    ) : (
-                      notifications.map(n => (
-                        <div
-                          key={n.id}
-                          className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors text-left"
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">
-                              {language === 'bn' ? n.titleBn : n.title}
-                            </span>
-                            <span className="text-[10px] text-slate-600 dark:text-slate-300 font-mono">
-                              {n.date}
-                            </span>
-                          </div>
-                          <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 line-clamp-2">
-                            {language === 'bn' ? n.messageBn : n.message}
-                          </p>
+                {/* Notification Dropdown */}
+                {notificationsOpen && (
+                  <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
+                    <div className="p-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                      <span className="font-semibold text-xs text-slate-900 dark:text-white uppercase tracking-wider">
+                        {t('notificationsTitle')}
+                      </span>
+                      <button
+                        onClick={() => setNotificationsOpen(false)}
+                        className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700/50">
+                      {notifications.length === 0 ? (
+                        <div className="p-4 text-center text-xs text-slate-500">
+                          {t('noNotifications')}
                         </div>
-                      ))
-                    )}
+                      ) : (
+                        notifications.map(n => (
+                          <div
+                            key={n.id}
+                            className="p-3 hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors text-left"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="font-semibold text-xs text-slate-900 dark:text-slate-100">
+                                {language === 'bn' ? n.titleBn : n.title}
+                              </span>
+                              <span className="text-[10px] text-slate-600 dark:text-slate-300 font-mono">
+                                {n.date}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 line-clamp-2">
+                              {language === 'bn' ? n.messageBn : n.message}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* User Session / Auth Action */}
             {user ? (
@@ -311,14 +315,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* Mobile Menu Trigger */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-              aria-label="Toggle Mobile Menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+            {/* Mobile Menu Trigger (Public site only) */}
+            {activeView !== 'dashboard' && (
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+                aria-label="Toggle Mobile Menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            )}
 
           </div>
         </div>

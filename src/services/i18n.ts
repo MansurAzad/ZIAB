@@ -3,7 +3,7 @@ import { Language } from '../types';
 export const translations = {
   en: {
     // Brand
-    brandName: 'CITY SQUARE BD',
+    brandName: 'CITY ZONE SQUARE',
     brandTagline: 'Secure Real Estate & Fractional Investment',
     
     // Nav
@@ -138,7 +138,7 @@ export const translations = {
 
     // Payment Gateway Modal
     modalPayTitle: 'Secure Payment Gateway',
-    modalPayDesc: 'Authorized payment integration for City Square BD installment clearance.',
+    modalPayDesc: 'Authorized payment integration for CITY ZONE SQUARE installment clearance.',
     selectPaymentMethod: 'Select Payment Channel',
     bKashWallet: 'bKash Merchant Pay',
     nagadWallet: 'Nagad Direct',
@@ -155,7 +155,7 @@ export const translations = {
     verifiedStamp: 'GOVT. SUB-REGISTRY & RAJUK COMPLIANT',
 
     // Glance Widget
-    glanceTitle: 'City Square Portfolio Glance',
+    glanceTitle: 'CITY ZONE SQUARE Portfolio Glance',
     glanceNextDue: 'Next Due',
     glanceDividend: 'Monthly Dividend',
     glanceSynced: 'Cloud Synced',
@@ -168,7 +168,7 @@ export const translations = {
   },
   bn: {
     // Brand
-    brandName: 'সিটি স্কয়ার বিডি',
+    brandName: 'সিটি জোন স্কয়ার',
     brandTagline: 'নিরাপদ রিয়েল এস্টেট ও শেয়ার বিনিয়োগ',
     
     // Nav
@@ -303,7 +303,7 @@ export const translations = {
 
     // Payment Gateway Modal
     modalPayTitle: 'নিরাপদ পেমেন্ট গেটওয়ে',
-    modalPayDesc: 'সিটি স্কয়ার বিডি অনুমোদিত নিরাপদ পেমেন্ট চ্যানেল।',
+    modalPayDesc: 'সিটি জোন স্কয়ার অনুমোদিত নিরাপদ পেমেন্ট চ্যানেল।',
     selectPaymentMethod: 'পেমেন্ট মাধ্যম বেছে নিন',
     bKashWallet: 'বিকাশ মার্চেন্ট পে',
     nagadWallet: 'নগদ ডিরেক্ট',
@@ -320,7 +320,7 @@ export const translations = {
     verifiedStamp: 'গণপ্রজাতন্ত্রী বাংলাদেশ সরকার ও রাজউক মানসম্পন্ন',
 
     // Glance Widget
-    glanceTitle: 'সিটি স্কয়ার পোর্টফোলিও একনজরে',
+    glanceTitle: 'সিটি জোন স্কয়ার পোর্টফোলিও একনজরে',
     glanceNextDue: 'পরবর্তী কিস্তি',
     glanceDividend: 'মাসিক লভ্যাংশ',
     glanceSynced: 'ক্লাউড সিঙ্ক সক্রিয়',

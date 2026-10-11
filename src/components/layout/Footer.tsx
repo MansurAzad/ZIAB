@@ -24,14 +24,14 @@ export const Footer: React.FC<FooterProps> = ({ language, onNavigate, onOpenAuth
                 <Building2 className="w-5 h-5" />
               </div>
               <span className="font-extrabold text-white text-lg tracking-tight">
-                CITY SQUARE <span className="text-amber-500">BD</span>
+                CITY ZONE <span className="text-amber-500">SQUARE</span>
               </span>
             </div>
             
             <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
               {language === 'bn'
-                ? 'সিটি স্কয়ার বিডি রিয়েল এস্টেট খাতের একটি শীর্ষস্থানীয় প্রতিষ্ঠান। আধুনিক বাসস্থান, পরিকল্পিত টাউনশিপ ও লাভজনক হোটেল শেয়ার বিনিয়োগে বিশ্বস্ত অংশীদার।'
-                : 'City Square BD is a premier corporate developer in Bangladesh delivering 100% dispute-free residential plots, master-planned townships, and high-yield hospitality investments.'}
+                ? 'সিটি জোন স্কয়ার রিয়েল এস্টেট খাতের একটি শীর্ষস্থানীয় প্রতিষ্ঠান। আধুনিক বাসস্থান, পরিকল্পিত টাউনশিপ ও লাভজনক হোটেল শেয়ার বিনিয়োগে বিশ্বস্ত অংশীদার।'
+                : 'CITY ZONE SQUARE is a premier corporate developer in Bangladesh delivering 100% dispute-free residential plots, master-planned townships, and high-yield hospitality investments.'}
             </p>
 
             <div className="flex items-center gap-2 text-slate-500 text-[11px]">

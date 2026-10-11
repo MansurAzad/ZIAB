@@ -35,7 +35,8 @@ import {
   Send,
   Network,
   Sparkles,
-  Upload
+  Upload,
+  X
 } from 'lucide-react';
 import {
   User,
@@ -64,6 +65,7 @@ import { VacationBookingView } from './VacationBookingView';
 import { MemberTransferView } from './MemberTransferView';
 import { DepositSlipUploadView } from './DepositSlipUploadView';
 import { ReferralTreeView } from './ReferralTreeView';
+import { ReferralProgramView } from './ReferralProgramView';
 import { TransactionPinSecurityView } from './TransactionPinSecurityView';
 
 interface DashboardLayoutProps {
@@ -136,6 +138,32 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  // New Plot Booking Request Modal state
+  const [isNewPlotModalOpen, setIsNewPlotModalOpen] = useState(false);
+  const [newPlotProject, setNewPlotProject] = useState('City R Mega Town - Purbachal');
+  const [newPlotKatha, setNewPlotKatha] = useState(5);
+  const [newPlotFacing, setNewPlotFacing] = useState('South Facing (Park View)');
+  const [newPlotDownpayment, setNewPlotDownpayment] = useState(500000);
+
+  const handleCreateNewPlotBooking = (e: React.FormEvent) => {
+    e.preventDefault();
+    const ratePerKatha = newPlotProject.includes('Mawa') ? 550000 : 700000;
+    const totalCost = ratePerKatha * newPlotKatha;
+    StorageService.createPlot({
+      projectName: newPlotProject,
+      projectNameBn: newPlotProject.includes('Mawa') ? 'মাওয়া এক্সপ্রেসওয়ে স্মার্ট সিটি' : 'সিটি আর মেগা টাউন - পূর্বাচল',
+      sector: newPlotProject.includes('Mawa') ? 'Block B' : 'Sector 5',
+      roadNo: 'Road #4 (40ft Avenue)',
+      katha: newPlotKatha,
+      facing: newPlotFacing,
+      totalCost,
+      paidAmount: newPlotDownpayment,
+      status: 'booked'
+    });
+    onRefreshData();
+    setIsNewPlotModalOpen(false);
+  };
+
   const t = (key: keyof typeof translations.en) => getTranslation(language, key);
 
   // Computed metrics
@@ -177,20 +205,17 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   };
 
   const handleCopyReferral = () => {
-    const refUrl = `https://citysquarebd.com/user/register?ref=${user.username}`;
+    const refUrl = `${window.location.origin}/user/register?ref=${user.username}&code=${user.referralCode || user.memberId}`;
     navigator.clipboard?.writeText(refUrl);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
+  // User Dashboard Navigation Items - Hiding plot 3D, hotel shares, 7 days vacation, and site drone/cctv as requested
   const navItems = [
     { id: 'overview', label: t('dashOverview'), icon: LayoutDashboard },
     { id: 'profile', label: t('dashProfile'), icon: UserIcon },
     { id: 'plots', label: t('dashPlots'), icon: MapPin },
-    { id: 'plot_visualizer', label: t('dashPlotVisualizer'), icon: Ruler },
-    { id: 'shares', label: t('dashShares'), icon: Hotel },
-    { id: 'vacation', label: t('dashVacation'), icon: Sparkles },
-    { id: 'site_progress', label: t('dashSiteProgress'), icon: Camera },
     { id: 'installments', label: t('dashInstallments'), icon: CreditCard },
     { id: 'slip_upload', label: t('dashSlipUpload'), icon: Upload },
     { id: 'dividends', label: t('dashDividends'), icon: Wallet },
@@ -313,7 +338,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                       {formatBDT(totalPortfolioValue, language)}
                     </span>
                     <span className="text-[11px] text-slate-400 mt-1 block">
-                      1 Land Plot + 2 Hotel Shares
+                      City R Mega Town (Purbachal Sector 4)
                     </span>
                   </div>
 
@@ -448,47 +473,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   </div>
                 )}
 
-                {/* Hotel Share Snapshot Card */}
-                {activeShare && (
-                  <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
-                      <div>
-                        <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                          Hospitality Fractional Ownership
-                        </span>
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                          {activeShare.projectName}
-                        </h2>
-                      </div>
-                      <button
-                        onClick={() => handleOpenCertificate('hotel_share')}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700 text-xs font-semibold hover:bg-emerald-500/20 transition-colors"
-                      >
-                        Share Certificate
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-                      <div>
-                        <span className="text-slate-400 block">Share Unit Numbers</span>
-                        <strong className="text-slate-900 dark:text-white font-mono">{activeShare.shareNumbers.join(', ')}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block">Monthly Dividend</span>
-                        <strong className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">+{formatBDT(activeShare.monthlyDividendAmount, language)} / mo</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block">Total Dividends Received</span>
-                        <strong className="text-slate-900 dark:text-white font-mono">{formatBDT(activeShare.totalDividendsEarned, language)}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block">Project Status</span>
-                        <strong className="text-slate-900 dark:text-white">{activeShare.projectCompletionPercentage}% Construction Done</strong>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
               </div>
             )}
 
@@ -504,21 +488,32 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             {/* TAB: MY PLOTS */}
             {activeTab === 'plots' && (
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                       {t('dashPlots')}
                     </h2>
                     <p className="text-xs text-slate-500">
-                      Residential land units booked under your membership in City Square BD townships.
+                      {language === 'bn'
+                        ? 'সিটি জোন স্কয়ার টাউনশিপে আপনার মেম্বারশিপের অধীনে সংরক্ষিত আবাসিক ও বাণিজ্যিক প্লট।'
+                        : 'Residential and commercial land units booked under your membership in CITY ZONE SQUARE townships.'}
                     </p>
                   </div>
-                  <button
-                    onClick={onOpenMasterPlan}
-                    className="px-3 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition-colors"
-                  >
-                    Open Sector 4 Map
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setIsNewPlotModalOpen(true)}
+                      className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>{language === 'bn' ? 'নতুন প্লট বুকিং আবেদন' : 'Book New Plot'}</span>
+                    </button>
+                    <button
+                      onClick={onOpenMasterPlan}
+                      className="px-3 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition-colors"
+                    >
+                      Open Sector 4 Map
+                    </button>
+                  </div>
                 </div>
 
                 {plots.map(plot => (
@@ -1006,54 +1001,20 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
             {/* TAB: REFERRAL & NETWORK */}
             {activeTab === 'affiliate' && (
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                    {t('dashAffiliate')}
-                  </h2>
-                  <p className="text-xs text-slate-500">
-                    Earn up to 2% referral incentives when family & friends book plots in City Square BD townships.
-                  </p>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
-                    Your Personalized Referral Link
-                  </span>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value={`https://citysquarebd.com/user/register?ref=${user.username}`}
-                      className="flex-1 px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-mono text-slate-800 dark:text-slate-200"
-                    />
-                    <button
-                      onClick={handleCopyReferral}
-                      className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{copySuccess ? 'Copied!' : 'Copy Link'}</span>
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <div>
-                      <span className="text-xs text-slate-400 block">Total Referral Earnings:</span>
-                      <strong className="text-lg font-extrabold text-emerald-600 font-mono">৳25,000</strong>
-                    </div>
-                    <div>
-                      <span className="text-xs text-slate-400 block">Network Conversions:</span>
-                      <strong className="text-lg font-extrabold text-slate-900 dark:text-white font-mono">1 Plot Allotment</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ReferralProgramView
+                user={user}
+                language={language}
+                onNavigateToTree={() => setActiveTab('referral_tree')}
+              />
             )}
 
             {/* TAB: GENERATION TREE & TEAM */}
             {activeTab === 'referral_tree' && (
-              <ReferralTreeView user={user} language={language} />
+              <ReferralTreeView
+                user={user}
+                language={language}
+                onNavigateToProgram={() => setActiveTab('affiliate')}
+              />
             )}
 
             {/* TAB: SUPPORT DESK */}
@@ -1210,6 +1171,134 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             onRefreshData();
           }}
         />
+      )}
+
+      {/* New Plot Booking Application Modal */}
+      {isNewPlotModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    {language === 'bn' ? 'নতুন প্লট বুকিং আবেদন' : 'Apply for New Plot Booking'}
+                  </h3>
+                  <span className="text-[11px] text-slate-500">
+                    CITY ZONE SQUARE Corporate Land Portfolio
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsNewPlotModalOpen(false)}
+                className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateNewPlotBooking} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {language === 'bn' ? 'প্রকল্প নির্বাচন করুন' : 'Select Project'} *
+                </label>
+                <select
+                  value={newPlotProject}
+                  onChange={e => setNewPlotProject(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                >
+                  <option value="City R Mega Town - Purbachal">City R Mega Town (Purbachal Expressway)</option>
+                  <option value="Mawa Expressway Smart City">Mawa Expressway Smart City (Padma Bridge Enclave)</option>
+                  <option value="Marine Drive Coastal Enclave">Marine Drive Coastal Residential Estate</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                    {language === 'bn' ? 'প্লটের আকার (কাঠা)' : 'Plot Size (Katha)'} *
+                  </label>
+                  <select
+                    value={newPlotKatha}
+                    onChange={e => setNewPlotKatha(Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  >
+                    <option value={3}>3 Katha</option>
+                    <option value={5}>5 Katha</option>
+                    <option value={7.5}>7.5 Katha</option>
+                    <option value={10}>10 Katha (Commercial/Estate)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                    {language === 'bn' ? 'প্লটের দিক' : 'Facing / Location'} *
+                  </label>
+                  <select
+                    value={newPlotFacing}
+                    onChange={e => setNewPlotFacing(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  >
+                    <option value="South Facing (Park View)">South Facing (Park View)</option>
+                    <option value="North Facing (60ft Road)">North Facing (60ft Road)</option>
+                    <option value="Lakeside Avenue Corner">Lakeside Avenue Corner</option>
+                    <option value="East Facing (Corner Plot)">East Facing (Corner Plot)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                  {language === 'bn' ? 'প্রাথমিক ডাউনপেমেন্ট (টাকা)' : 'Downpayment Amount (BDT)'} *
+                </label>
+                <input
+                  type="number"
+                  min={100000}
+                  step={50000}
+                  value={newPlotDownpayment}
+                  onChange={e => setNewPlotDownpayment(Number(e.target.value))}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+                  required
+                />
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1 text-slate-600 dark:text-slate-300">
+                <div className="flex justify-between">
+                  <span>Estimated Total Price:</span>
+                  <strong className="font-mono text-slate-900 dark:text-white">
+                    ৳{((newPlotProject.includes('Mawa') ? 550000 : 700000) * newPlotKatha).toLocaleString()}
+                  </strong>
+                </div>
+                <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span>Booking Downpayment:</span>
+                  <strong className="font-mono">৳{newPlotDownpayment.toLocaleString()}</strong>
+                </div>
+                <div className="flex justify-between text-[11px] text-slate-400">
+                  <span>Installment Plan:</span>
+                  <span>48 Equal Monthly Installments</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsNewPlotModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 font-medium"
+                >
+                  {language === 'bn' ? 'বাতিল' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-xs transition-colors"
+                >
+                  {language === 'bn' ? 'বুকিং আবেদন নিশ্চিত করুন' : 'Confirm Plot Booking'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Registered Bayna Deed Modal */}

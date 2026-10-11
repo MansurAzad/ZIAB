@@ -25,7 +25,34 @@ export interface User {
   joinedDate: string;
   e2eEncryptionKey: string;
   twoFactorEnabled: boolean;
+  referralCode?: string;
   nominee: UserNominee;
+}
+
+export interface ReferralSignup {
+  id: string;
+  name: string;
+  nameBn?: string;
+  username: string;
+  memberId: string;
+  email: string;
+  phone: string;
+  avatar?: string;
+  sponsorUsername: string;
+  sponsorName: string;
+  generation: 1 | 2 | 3;
+  signupDate: string;
+  signupTime?: string;
+  status: 'active' | 'pending' | 'completed';
+  assetBooked: string;
+  investmentValue: number;
+  commissionEarned: number;
+  commissionRate: number; // e.g. 5 for 5%
+  payoutStatus: 'credited' | 'pending' | 'available';
+  rank: string;
+  location: string;
+  kycVerified: boolean;
+  notes?: string;
 }
 
 export interface PlotBooking {
@@ -51,12 +78,23 @@ export interface PlotBooking {
   csSaRsBsVerified: boolean;
   allotmentLetterNo: string;
   coordinates: { x: number; y: number };
+  baynaRegistered?: boolean;
+  csDaagNo?: string;
+  saDaagNo?: string;
+  rsDaagNo?: string;
+  bsDaagNo?: string;
+  mouza?: string;
+  jlNo?: string;
+  monthlyInstallmentAmount?: number;
 }
 
 export interface ShareInvestment {
   id: string;
   projectName: string;
   projectNameBn: string;
+  location?: string;
+  locationBn?: string;
+  suiteNo?: string;
   shareCategory: 'luxury_suite' | 'deluxe_room' | 'commercial_retail';
   shareUnits: number;
   shareNumbers: string[];
@@ -162,4 +200,29 @@ export interface ProjectInfo {
   overallProgressPercentage: number;
   expectedHandoverYear: string;
   milestones: ConstructionMilestone[];
+}
+
+export interface NoticeItem {
+  id: string;
+  title: string;
+  category: string;
+  content?: string;
+  date: string;
+  priority: 'high' | 'normal' | 'urgent';
+  status: 'published' | 'draft';
+  documentUrl?: string;
+}
+
+export interface VacationBooking {
+  id: string;
+  memberId: string;
+  memberName: string;
+  checkInDate: string;
+  checkOutDate: string;
+  guestsCount: number;
+  roomType: string;
+  specialRequest?: string;
+  bookingStatus: 'confirmed' | 'pending' | 'cancelled';
+  confirmationCode: string;
+  createdAt: string;
 }

@@ -41,12 +41,24 @@ import {
   FileText,
   Send,
   Trash2,
-  ChevronRight
+  ChevronRight,
+  Edit2,
+  MessageSquare,
+  PlusCircle
 } from 'lucide-react';
-import { User, Language, PlotBooking, ShareInvestment, InstallmentRecord, TransactionRecord } from '../../types';
+import { User, Language, PlotBooking, ShareInvestment, InstallmentRecord, TransactionRecord, SupportTicket } from '../../types';
 import { AdminInvestor, AdminPlotItem, AdminDepositSlip, AdminPlotTransferRequest, AdminSiteTourBooking, AdminDividendRound, AdminAuditLog } from '../../types/admin';
 import { formatBDT } from '../../services/i18n';
 import { StorageService } from '../../services/storage';
+import {
+  AddInvestorModal,
+  EditInvestorModal,
+  AddPlotModal,
+  EditPlotModal,
+  AddManualSlipModal,
+  AddTourModal,
+  ReplyTicketModal
+} from './AdminModals';
 
 interface AdminDashboardProps {
   currentUser: User;
@@ -539,6 +551,103 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     showToast('Official notice published to Notice Board successfully!');
   };
 
+  // CRUD: Investors
+  const [isAddInvestorModalOpen, setIsAddInvestorModalOpen] = useState(false);
+  const [editingInvestor, setEditingInvestor] = useState<AdminInvestor | null>(null);
+
+  const handleAddInvestor = (newInv: Omit<AdminInvestor, 'id'>) => {
+    const inv: AdminInvestor = { id: 'usr-' + Date.now(), ...newInv };
+    setInvestors(prev => [inv, ...prev]);
+    showToast(`Investor @${inv.username} (${inv.fullName}) successfully registered in CRM!`);
+  };
+
+  const handleUpdateInvestor = (updated: AdminInvestor) => {
+    setInvestors(prev => prev.map(i => i.id === updated.id ? updated : i));
+    showToast(`Investor profile for ${updated.fullName} updated successfully!`);
+  };
+
+  const handleDeleteInvestor = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete/deactivate investor ${name}?`)) {
+      setInvestors(prev => prev.filter(i => i.id !== id));
+      showToast(`Investor ${name} has been removed from active CRM.`);
+    }
+  };
+
+  // CRUD: Plots
+  const [isAddPlotModalOpen, setIsAddPlotModalOpen] = useState(false);
+  const [editingPlot, setEditingPlot] = useState<AdminPlotItem | null>(null);
+
+  const handleAddPlot = (newPlot: Omit<AdminPlotItem, 'id'>) => {
+    const plot: AdminPlotItem = { id: 'plot-' + Date.now(), ...newPlot };
+    setPlots(prev => [plot, ...prev]);
+    showToast(`Plot #${plot.plotNo} (${plot.projectName}) added to inventory!`);
+  };
+
+  const handleUpdatePlot = (updated: AdminPlotItem) => {
+    setPlots(prev => prev.map(p => p.id === updated.id ? updated : p));
+    showToast(`Plot #${updated.plotNo} record updated successfully!`);
+  };
+
+  const handleDeletePlot = (id: string, plotNo: string) => {
+    if (window.confirm(`Remove plot #${plotNo} from inventory?`)) {
+      setPlots(prev => prev.filter(p => p.id !== id));
+      showToast(`Plot #${plotNo} deleted from master catalog.`);
+    }
+  };
+
+  // CRUD: Slips
+  const [isAddSlipModalOpen, setIsAddSlipModalOpen] = useState(false);
+
+  const handleAddManualSlip = (slip: AdminDepositSlip) => {
+    setDepositSlips(prev => [slip, ...prev]);
+    showToast(`Manual deposit of ৳${slip.amount.toLocaleString()} recorded and credited!`);
+  };
+
+  const handleDeleteSlip = (id: string, slipNo: string) => {
+    setDepositSlips(prev => prev.filter(s => s.id !== id));
+    showToast(`Deposit Slip #${slipNo} removed.`);
+  };
+
+  // CRUD: Site Tours
+  const [isAddTourModalOpen, setIsAddTourModalOpen] = useState(false);
+
+  const handleAddTour = (tourData: Omit<AdminSiteTourBooking, 'id'>) => {
+    const tour: AdminSiteTourBooking = { id: 'tour-' + Date.now(), ...tourData };
+    setSiteTours(prev => [tour, ...prev]);
+    showToast(`Weekend site tour for ${tour.clientName} successfully scheduled!`);
+  };
+
+  const handleDeleteTour = (id: string, clientName: string) => {
+    setSiteTours(prev => prev.filter(t => t.id !== id));
+    showToast(`Tour booking for ${clientName} cancelled.`);
+  };
+
+  // CRUD: Support Tickets
+  const [tickets, setTickets] = useState<SupportTicket[]>(() => StorageService.getTickets());
+  const [selectedTicketForReply, setSelectedTicketForReply] = useState<SupportTicket | null>(null);
+  const [ticketFilterStatus, setTicketFilterStatus] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
+
+  const handleReplyTicket = (ticketId: string, replyText: string) => {
+    const updated = StorageService.replyTicket(ticketId, replyText, 'support', `${currentUser.fullName} (Support Admin)`);
+    if (updated) {
+      setTickets(StorageService.getTickets());
+      showToast('Support reply sent and ticket updated!');
+    }
+  };
+
+  const handleToggleTicketStatus = (ticket: SupportTicket) => {
+    const newStatus = ticket.status === 'resolved' ? 'open' : 'resolved';
+    StorageService.updateTicketStatus(ticket.id, newStatus);
+    setTickets(StorageService.getTickets());
+    showToast(`Ticket status updated to ${newStatus.toUpperCase()}`);
+  };
+
+  const handleDeleteTicket = (ticketId: string) => {
+    StorageService.deleteTicket(ticketId);
+    setTickets(StorageService.getTickets());
+    showToast('Support ticket deleted.');
+  };
+
   // Filtered Investors
   const filteredInvestors = investors.filter(inv => {
     const matchesSearch = inv.fullName.toLowerCase().includes(investorSearchQuery.toLowerCase()) ||
@@ -551,6 +660,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       (investorFilterStatus === 'suspended' && inv.status === 'suspended');
     return matchesSearch && matchesStatus;
   });
+
+  // Filtered Support Tickets
+  const filteredTickets = tickets.filter(t => {
+    if (ticketFilterStatus === 'all') return true;
+    return t.status === ticketFilterStatus;
+  });
+  const openTicketsCount = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length;
 
   // KPI Calculations
   const totalRevenue = plots.reduce((acc, p) => acc + p.paidAmount, 0) + 1200000 * 3;
@@ -582,7 +698,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold tracking-tight text-lg text-white">
-                  CITY SQUARE <span className="text-amber-500">BD</span>
+                  CITY ZONE <span className="text-amber-500">SQUARE</span>
                 </span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   ADMIN 360°
@@ -652,6 +768,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             { id: 'accounts', label: 'Bank Slips & Accounts', icon: CreditCard, badge: pendingSlipsCount > 0 ? pendingSlipsCount : null },
             { id: 'site_tours', label: 'Site Tour Coordination', icon: Car, badge: pendingToursCount > 0 ? pendingToursCount : null },
             { id: 'notices', label: 'Notice Board CMS', icon: Bell, badge: null },
+            { id: 'support', label: 'Support Helpdesk', icon: HelpCircle, badge: openTicketsCount > 0 ? openTicketsCount : null },
             { id: 'audit', label: 'Audit Trail & Logs', icon: ShieldCheck, badge: null }
           ].map(tab => {
             const Icon = tab.icon;
@@ -984,7 +1101,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </p>
               </div>
 
-              {/* Search and Filters */}
+              {/* Search, Filters & Add Action */}
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
@@ -1007,6 +1124,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <option value="pending">KYC Pending</option>
                   <option value="suspended">Suspended</option>
                 </select>
+
+                <button
+                  onClick={() => setIsAddInvestorModalOpen(true)}
+                  className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors whitespace-nowrap"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Investor</span>
+                </button>
               </div>
             </div>
 
@@ -1066,7 +1191,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             {inv.kycStatus === 'pending' && (
                               <button
                                 onClick={() => handleApproveKYC(inv.id)}
-                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors"
+                                className="px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors"
                                 title="Approve KYC"
                               >
                                 Approve KYC
@@ -1074,10 +1199,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             )}
                             <button
                               onClick={() => setSelectedInvestorForModal(inv)}
-                              className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-[11px] transition-colors flex items-center gap-1"
+                              className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-[11px] transition-colors flex items-center gap-1"
+                              title="Inspect Investor Profile"
                             >
                               <Eye className="w-3 h-3 text-amber-400" />
-                              <span>Inspect</span>
+                              <span className="hidden sm:inline">Inspect</span>
+                            </button>
+                            <button
+                              onClick={() => setEditingInvestor(inv)}
+                              className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-colors flex items-center gap-1"
+                              title="Edit Investor Data"
+                            >
+                              <Edit2 className="w-3 h-3 text-amber-400" />
+                              <span className="hidden sm:inline">Edit</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteInvestor(inv.id, inv.fullName)}
+                              className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+                              title="Delete Investor"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </td>
@@ -1257,9 +1398,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">
                   Master Plots Catalog & Handover Status
                 </h3>
-                <span className="text-xs text-amber-400 font-mono font-bold">
-                  {plots.length} Recorded Units
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-amber-400 font-mono font-bold">
+                    {plots.length} Recorded Units
+                  </span>
+                  <button
+                    onClick={() => setIsAddPlotModalOpen(true)}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add New Plot</span>
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-x-auto">
@@ -1274,6 +1424,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <th className="p-3.5 font-mono">Paid Amount</th>
                       <th className="p-3.5">Bayna Status</th>
                       <th className="p-3.5 text-center">Status</th>
+                      <th className="p-3.5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800">
@@ -1326,6 +1477,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           }`}>
                             {plot.status.toUpperCase()}
                           </span>
+                        </td>
+                        <td className="p-3.5 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => setEditingPlot(plot)}
+                              className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold text-[11px] flex items-center gap-1 transition-colors"
+                              title="Edit Plot"
+                            >
+                              <Edit2 className="w-3 h-3 text-amber-400" />
+                              <span className="hidden sm:inline">Edit</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeletePlot(plot.id, plot.plotNo)}
+                              className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+                              title="Delete Plot"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1612,6 +1782,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   Review member bank deposit slips and pay orders to issue official Money Receipts (MR).
                 </p>
               </div>
+              <button
+                onClick={() => setIsAddSlipModalOpen(true)}
+                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors whitespace-nowrap"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Record Manual Deposit</span>
+              </button>
             </div>
 
             <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-sm overflow-hidden">
@@ -1662,24 +1839,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </span>
                         </td>
                         <td className="p-3.5 text-right">
-                          {slip.status === 'pending' ? (
-                            <div className="flex items-center justify-end gap-1.5">
-                              <button
-                                onClick={() => handleRejectSlip(slip)}
-                                className="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 font-semibold text-[11px]"
-                              >
-                                Reject
-                              </button>
-                              <button
-                                onClick={() => handleApproveSlip(slip)}
-                                className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]"
-                              >
-                                Approve
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="text-[11px] text-slate-500">Processed</span>
-                          )}
+                          <div className="flex items-center justify-end gap-1.5">
+                            {slip.status === 'pending' ? (
+                              <>
+                                <button
+                                  onClick={() => handleRejectSlip(slip)}
+                                  className="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 font-semibold text-[11px]"
+                                >
+                                  Reject
+                                </button>
+                                <button
+                                  onClick={() => handleApproveSlip(slip)}
+                                  className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px]"
+                                >
+                                  Approve
+                                </button>
+                              </>
+                            ) : (
+                              <span className="text-[11px] text-slate-500">Processed</span>
+                            )}
+                            <button
+                              onClick={() => handleDeleteSlip(slip.id, slip.slipNo)}
+                              className="p-1 rounded text-rose-400 hover:bg-rose-500/10 transition-colors"
+                              title="Delete Slip"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1706,6 +1892,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   Manage visitor bookings submitted from the website and assign transport coordinators.
                 </p>
               </div>
+              <button
+                onClick={() => setIsAddTourModalOpen(true)}
+                className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-colors whitespace-nowrap"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Schedule New Tour</span>
+              </button>
             </div>
 
             <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-sm overflow-hidden">
@@ -1755,18 +1948,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           )}
                         </td>
                         <td className="p-3.5 text-right">
-                          {tour.status === 'pending' ? (
+                          <div className="flex items-center justify-end gap-1.5">
+                            {tour.status === 'pending' ? (
+                              <button
+                                onClick={() => handleConfirmTour(tour.id)}
+                                className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition-colors"
+                              >
+                                Assign & Confirm
+                              </button>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                Confirmed
+                              </span>
+                            )}
                             <button
-                              onClick={() => handleConfirmTour(tour.id)}
-                              className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition-colors"
+                              onClick={() => handleDeleteTour(tour.id, tour.clientName)}
+                              className="p-1 rounded text-rose-400 hover:bg-rose-500/10 transition-colors"
+                              title="Cancel / Delete Tour"
                             >
-                              Assign & Confirm
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
-                          ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                              Confirmed
-                            </span>
-                          )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1887,6 +2089,131 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )}
 
         {/* ============================================================ */}
+        {/* TAB: SUPPORT HELPDESK & TICKET MANAGEMENT */}
+        {/* ============================================================ */}
+        {activeTab === 'support' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold text-white">
+                  Investor Support Desk & Ticket Resolution
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Manage incoming inquiries, provide administrative replies, and resolve investor tickets.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <select
+                  value={ticketFilterStatus}
+                  onChange={e => setTicketFilterStatus(e.target.value as any)}
+                  className="px-3 py-1.5 text-xs rounded-xl border border-slate-700 bg-slate-800 text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="all">All Ticket Status</option>
+                  <option value="open">Open / Unresolved</option>
+                  <option value="in_progress">In-Progress</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-800/80 border-b border-slate-800 text-slate-400 font-semibold uppercase">
+                    <tr>
+                      <th className="p-3.5">Ticket # & Subject</th>
+                      <th className="p-3.5">Category</th>
+                      <th className="p-3.5">Priority</th>
+                      <th className="p-3.5">Latest Message</th>
+                      <th className="p-3.5">Updated</th>
+                      <th className="p-3.5 text-center">Status</th>
+                      <th className="p-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800">
+                    {filteredTickets.map(t => (
+                      <tr key={t.id} className="hover:bg-slate-800/40">
+                        <td className="p-3.5">
+                          <strong className="text-white text-sm block">{t.subject}</strong>
+                          <span className="text-[10px] text-amber-400 font-mono">#{t.ticketNo}</span>
+                        </td>
+                        <td className="p-3.5 text-slate-300 font-medium">
+                          {t.category.toUpperCase()}
+                        </td>
+                        <td className="p-3.5">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            t.priority === 'high'
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                              : t.priority === 'medium'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              : 'bg-slate-800 text-slate-400'
+                          }`}>
+                            {t.priority.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-slate-300 max-w-xs truncate">
+                          {t.messages[t.messages.length - 1]?.text || 'No message'}
+                        </td>
+                        <td className="p-3.5 font-mono text-slate-400">
+                          {t.updatedAt}
+                        </td>
+                        <td className="p-3.5 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            t.status === 'resolved'
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                              : t.status === 'in_progress'
+                              ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30'
+                              : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 animate-pulse'
+                          }`}>
+                            {t.status.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="p-3.5 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => setSelectedTicketForReply(t)}
+                              className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] flex items-center gap-1 transition-colors"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              <span>Reply</span>
+                            </button>
+                            <button
+                              onClick={() => handleToggleTicketStatus(t)}
+                              className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition-colors ${
+                                t.status === 'resolved'
+                                  ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                                  : 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30'
+                              }`}
+                            >
+                              {t.status === 'resolved' ? 'Reopen' : 'Resolve'}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTicket(t.id)}
+                              className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-colors"
+                              title="Delete Ticket"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {filteredTickets.length === 0 && (
+                      <tr>
+                        <td colSpan={7} className="p-8 text-center text-slate-500 text-xs">
+                          No support tickets found in this category.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================ */}
         {/* TAB 9: AUDIT TRAIL & SYSTEM LOGS */}
         {/* ============================================================ */}
         {activeTab === 'audit' && (
@@ -1960,6 +2287,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           </div>
         )}
+
+      {/* CRUD Modals */}
+      <AddInvestorModal
+        isOpen={isAddInvestorModalOpen}
+        onClose={() => setIsAddInvestorModalOpen(false)}
+        onAdd={handleAddInvestor}
+      />
+
+      <EditInvestorModal
+        investor={editingInvestor}
+        onClose={() => setEditingInvestor(null)}
+        onSave={handleUpdateInvestor}
+      />
+
+      <AddPlotModal
+        isOpen={isAddPlotModalOpen}
+        onClose={() => setIsAddPlotModalOpen(false)}
+        onAdd={handleAddPlot}
+      />
+
+      <EditPlotModal
+        plot={editingPlot}
+        onClose={() => setEditingPlot(null)}
+        onSave={handleUpdatePlot}
+      />
+
+      <AddManualSlipModal
+        isOpen={isAddSlipModalOpen}
+        onClose={() => setIsAddSlipModalOpen(false)}
+        onAdd={handleAddManualSlip}
+      />
+
+      <AddTourModal
+        isOpen={isAddTourModalOpen}
+        onClose={() => setIsAddTourModalOpen(false)}
+        onAdd={handleAddTour}
+      />
+
+      <ReplyTicketModal
+        ticket={selectedTicketForReply}
+        onClose={() => setSelectedTicketForReply(null)}
+        onReply={handleReplyTicket}
+      />
 
       </div>
     </div>
