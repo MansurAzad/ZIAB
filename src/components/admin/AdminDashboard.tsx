@@ -46,7 +46,7 @@ import {
   MessageSquare,
   PlusCircle
 } from 'lucide-react';
-import { User, Language, PlotBooking, ShareInvestment, InstallmentRecord, TransactionRecord, SupportTicket } from '../../types';
+import { User, Language, PlotBooking, ShareInvestment, InstallmentRecord, TransactionRecord, SupportTicket, DoubleProfitPlan } from '../../types';
 import { AdminInvestor, AdminPlotItem, AdminDepositSlip, AdminPlotTransferRequest, AdminSiteTourBooking, AdminDividendRound, AdminAuditLog } from '../../types/admin';
 import { formatBDT } from '../../services/i18n';
 import { StorageService } from '../../services/storage';
@@ -57,7 +57,8 @@ import {
   EditPlotModal,
   AddManualSlipModal,
   AddTourModal,
-  ReplyTicketModal
+  ReplyTicketModal,
+  AddDoublePlanModal
 } from './AdminModals';
 
 interface AdminDashboardProps {
@@ -76,7 +77,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onSwitchToPublic
 }) => {
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'investors' | 'plots' | 'shares' | 'mlm' | 'accounts' | 'site_tours' | 'notices' | 'support' | 'audit'
+    'overview' | 'investors' | 'plots' | 'double_profit' | 'shares' | 'mlm' | 'accounts' | 'site_tours' | 'notices' | 'support' | 'audit'
   >('overview');
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -84,6 +85,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // 12-Month Double Profit Schemes & Monthly Installment Disbursement
+  const [doubleProfitPlans, setDoubleProfitPlans] = useState<DoubleProfitPlan[]>(() => {
+    return StorageService.getDoubleProfitPlans();
+  });
+  const [isAddDoublePlanModalOpen, setIsAddDoublePlanModalOpen] = useState(false);
+
+  const handleDisburseInstallment = (planId: string) => {
+    const res = StorageService.disburseDoubleProfitInstallment(planId);
+    if (res && res.success) {
+      setDoubleProfitPlans(StorageService.getDoubleProfitPlans());
+      showToast(res.message);
+    } else {
+      showToast(res?.message || 'Failed to disburse installment.');
+    }
+  };
+
+  const handleDeleteDoublePlan = (planId: string) => {
+    if (window.confirm('Are you sure you want to delete this Double Profit Plan?')) {
+      StorageService.deleteDoubleProfitPlan(planId);
+      setDoubleProfitPlans(StorageService.getDoubleProfitPlans());
+      showToast('Double Profit Plan deleted successfully.');
+    }
+  };
+
+  const handleCreateDoublePlan = (plan: Partial<DoubleProfitPlan>) => {
+    StorageService.createDoubleProfitPlan(plan);
+    setDoubleProfitPlans(StorageService.getDoubleProfitPlans());
+    showToast('New 12-Month Double Profit Plan enrolled successfully!');
+    setIsAddDoublePlanModalOpen(false);
   };
 
   // 1. INVESTORS CRM DATA
@@ -763,6 +795,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             { id: 'overview', label: '360° Overview', icon: LayoutDashboard, badge: null },
             { id: 'investors', label: 'Investors & CRM', icon: Users, badge: pendingKycCount > 0 ? pendingKycCount : null },
             { id: 'plots', label: 'Plots & Land Inventory', icon: MapPin, badge: pendingNocCount > 0 ? pendingNocCount : null },
+            { id: 'double_profit', label: '12-Month Double Profit (মাসিক কিস্তি)', icon: Sparkles, badge: null },
             { id: 'shares', label: 'Hotel Shares & Dividends', icon: Hotel, badge: null },
             { id: 'mlm', label: 'MLM Commission & Ranks', icon: Network, badge: null },
             { id: 'accounts', label: 'Bank Slips & Accounts', icon: CreditCard, badge: pendingSlipsCount > 0 ? pendingSlipsCount : null },
@@ -1499,6 +1532,185 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         </td>
                       </tr>
                     ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ============================================================ */}
+        {/* TAB: 12-MONTH DOUBLE PROFIT SCHEMES & MONTHLY DISBURSEMENT   */}
+        {/* ============================================================ */}
+        {activeTab === 'double_profit' && (
+          <div className="space-y-6">
+            
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-white">
+                    12-Month Double Profit & Monthly Installment Disbursement
+                  </h2>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-slate-950 font-mono">
+                    2X SCHEME
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Manage all investor 2X capital plans, track 12 PDC Bank Cheques, and disburse monthly installments directly into wallets/ledgers.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsAddDoublePlanModalOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg flex items-center gap-1.5 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Enroll Investor in Double Profit Plan</span>
+                </button>
+              </div>
+            </div>
+
+            {/* KPI Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm">
+                <span className="text-slate-400 text-xs font-medium block">Total Enrolled Plans</span>
+                <span className="text-2xl font-black text-white font-mono mt-1 block">
+                  {doubleProfitPlans.length} Plans
+                </span>
+                <span className="text-[11px] text-amber-400 mt-1 block">
+                  {doubleProfitPlans.filter(p => p.status === 'active').length} Active Enrolments
+                </span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm">
+                <span className="text-slate-400 text-xs font-medium block">Total Capital Invested</span>
+                <span className="text-2xl font-black text-amber-400 font-mono mt-1 block">
+                  ৳{doubleProfitPlans.reduce((acc, p) => acc + p.principalAmount, 0).toLocaleString()}
+                </span>
+                <span className="text-[11px] text-slate-400 mt-1 block">
+                  100% Principal Collateral
+                </span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm">
+                <span className="text-slate-400 text-xs font-medium block">Total 2X Target Return (200%)</span>
+                <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
+                  ৳{doubleProfitPlans.reduce((acc, p) => acc + p.totalReturnAmount, 0).toLocaleString()}
+                </span>
+                <span className="text-[11px] text-emerald-500/80 font-medium mt-1 block">
+                  Disbursed in 12 Equal Installments
+                </span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm">
+                <span className="text-slate-400 text-xs font-medium block">Monthly Installment Outflow</span>
+                <span className="text-2xl font-black text-blue-400 font-mono mt-1 block">
+                  ৳{doubleProfitPlans.filter(p => p.status === 'active').reduce((acc, p) => acc + p.monthlyInstallmentAmount, 0).toLocaleString()}
+                </span>
+                <span className="text-[11px] text-slate-400 mt-1 block">
+                  Disbursed per Month
+                </span>
+              </div>
+            </div>
+
+            {/* Enrolled Plans Table */}
+            <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-sm">
+              <div className="p-4 bg-slate-800/70 border-b border-slate-800 flex items-center justify-between">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                  Active 12-Month Double Profit Portfolios & Monthly Installment Ledger
+                </h3>
+                <span className="text-xs font-mono text-slate-400">
+                  Total Disbursed to Date: ৳{doubleProfitPlans.reduce((acc, p) => acc + p.totalPaidOut, 0).toLocaleString()}
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-800/50 text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+                    <tr>
+                      <th className="p-3.5">Investor Member</th>
+                      <th className="p-3.5">Package & Capital</th>
+                      <th className="p-3.5">12-Mo Total Return</th>
+                      <th className="p-3.5">Monthly Installment</th>
+                      <th className="p-3.5">Installment Progress</th>
+                      <th className="p-3.5">Next Payout</th>
+                      <th className="p-3.5">Deed & 12 PDC Cheques</th>
+                      <th className="p-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800 font-mono">
+                    {doubleProfitPlans.map(plan => {
+                      const isCompleted = plan.status === 'completed' || plan.remainingInstallments <= 0;
+                      const progressPct = Math.round((plan.paidInstallments / plan.totalMonths) * 100);
+
+                      return (
+                        <tr key={plan.id} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="p-3.5">
+                            <strong className="text-white block font-sans text-xs">{plan.memberName}</strong>
+                            <span className="text-slate-400 text-[11px]">{plan.memberId}</span>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="text-slate-200 font-sans block text-xs">{plan.packageName}</span>
+                            <strong className="text-amber-400 text-xs">Capital: ৳{plan.principalAmount.toLocaleString()}</strong>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="text-emerald-400 font-bold text-sm block">৳{plan.totalReturnAmount.toLocaleString()}</span>
+                            <span className="text-[10px] text-slate-400 font-sans">200% Payout</span>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="text-amber-300 font-bold text-xs block">৳{plan.monthlyInstallmentAmount.toLocaleString()}</span>
+                            <span className="text-[10px] text-slate-400 font-sans">/ month</span>
+                          </td>
+                          <td className="p-3.5 min-w-36">
+                            <div className="flex items-center justify-between text-[11px] mb-1">
+                              <span className="text-slate-300 font-sans">{plan.paidInstallments}/12 Paid</span>
+                              <span className="text-emerald-400">{progressPct}%</span>
+                            </div>
+                            <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full"
+                                style={{ width: `${progressPct}%` }}
+                              />
+                            </div>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="text-slate-300 text-xs">{plan.nextPayoutDate}</span>
+                            <span className={`block text-[10px] font-sans font-bold ${isCompleted ? 'text-emerald-400' : 'text-blue-400'}`}>
+                              {isCompleted ? 'Completed' : 'Active'}
+                            </span>
+                          </td>
+                          <td className="p-3.5">
+                            <span className="text-[11px] text-slate-300 block">{plan.agreementDeedNo}</span>
+                            <span className="text-[10px] text-amber-400/90 font-mono">
+                              {plan.pdcCheckNumbers.length} PDC Cheques Backed
+                            </span>
+                          </td>
+                          <td className="p-3.5 text-right font-sans">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {!isCompleted && (
+                                <button
+                                  onClick={() => handleDisburseInstallment(plan.id)}
+                                  className="px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all flex items-center gap-1"
+                                  title="Disburse Next Monthly Installment"
+                                >
+                                  <CreditCard className="w-3.5 h-3.5" />
+                                  <span>Disburse Inst #{plan.paidInstallments + 1}</span>
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeleteDoublePlan(plan.id)}
+                                className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+                                title="Delete Plan"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -2329,6 +2541,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         ticket={selectedTicketForReply}
         onClose={() => setSelectedTicketForReply(null)}
         onReply={handleReplyTicket}
+      />
+
+      <AddDoublePlanModal
+        isOpen={isAddDoublePlanModalOpen}
+        onClose={() => setIsAddDoublePlanModalOpen(false)}
+        investors={investors}
+        onAdd={handleCreateDoublePlan}
       />
 
       </div>

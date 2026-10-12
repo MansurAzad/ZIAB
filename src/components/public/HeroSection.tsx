@@ -44,12 +44,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Unboxed Kicker */}
-        <div className="flex items-center gap-2 text-xs text-amber-400 font-semibold tracking-wide uppercase mb-4">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-amber-400 font-semibold tracking-wide uppercase mb-3">
           <span>CITY ZONE SQUARE</span>
           <span aria-hidden="true">·</span>
           <span>Official Investor Portal</span>
           <span aria-hidden="true">·</span>
           <span>Purbachal & Cox's Bazar</span>
+        </div>
+
+        {/* 12-Month Double Profit Scheme Alert Banner */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-emerald-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold mb-6 shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <span>
+            {language === 'bn'
+              ? 'বিশেষ প্রকল্প: ১২ মাসে ডাবল প্রফিট — প্রতি মাসে কিস্তি আকারে লাভ ও আসল বণ্টন!'
+              : 'Featured Scheme: 2X Double Return in 12 Months — Paid in 12 Monthly Installments!'}
+          </span>
         </div>
 
         {/* Hero Title & Value Proposition */}
@@ -133,10 +143,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
               <div>
                 <span className="text-xl sm:text-2xl font-extrabold text-amber-300 font-mono block">
-                  18.5%
+                  2X Return
                 </span>
                 <span className="text-xs text-slate-400 font-medium">
-                  {t('statYield')}
+                  {language === 'bn' ? '১২ মাসে ডাবল প্রফিট' : '12-Mo Double Return'}
                 </span>
               </div>
             </div>

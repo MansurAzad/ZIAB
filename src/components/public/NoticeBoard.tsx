@@ -38,6 +38,20 @@ export const NoticeBoard: React.FC<NoticeBoardProps> = ({ language }) => {
 
   const notices: NoticeItem[] = [
     {
+      id: 'not-00-double',
+      title: 'Company Official Announcement: 12-Month Guaranteed Double Profit Scheme (Paid in 12 Monthly Installments)',
+      titleBn: 'কোম্পানির অফিসিয়াল ঘোষণা: ১২ মাসে ডাবল প্রফিট প্রকল্প (প্রতি মাসে মাসিক কিস্তির মাধ্যমে রিটার্ন প্রদান)',
+      category: 'important',
+      categoryLabel: 'Special Double Return',
+      categoryLabelBn: '১২ মাসে ডাবল প্রফিট',
+      date: '11 October 2026',
+      urgent: true,
+      summary:
+        'Our company guarantees 2X total payout in 12 months (100% net profit). Both capital and profits are disbursed consecutively across 12 equal monthly installments directly into your bank or portal wallet. Backed by 12 Bank PDC Cheques and registered legal deed.',
+      summaryBn:
+        'আমাদের এই কোম্পানি দিচ্ছে ১২ মাসে নিশ্চিত ডাবল প্রফিট! আপনি যে পরিমাণ মূলধন বিনিয়োগ করবেন, ১২ মাসে তার দ্বিগুণ রিটার্ন পাবেন (১০০% নিট লাভ)। প্রতি মাসে সমান কিস্তি আকারে লাভ ও আসল সরাসরি আপনার ব্যাংক অ্যাকাউন্ট বা মোবাইল ওয়ালেটে পৌঁছে যাবে। ১২টি ব্যাংক সিকিউরিটি PDC চেক ও রেজিস্টার্ড চুক্তিপত্রের মাধ্যমে শতভাগ নিরাপদ।'
+    },
+    {
       id: 'not-01',
       title: 'City R Mega Town Sector 4 Plot Demarcation & Possession Schedule',
       titleBn: 'সিটি আর মেগা টাউন সেক্টর ৪ প্লট চিহ্নিতকরণ ও দখল বুঝিয়ে দেওয়ার সময়সূচী',

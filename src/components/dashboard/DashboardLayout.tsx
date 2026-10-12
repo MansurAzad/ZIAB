@@ -67,6 +67,7 @@ import { DepositSlipUploadView } from './DepositSlipUploadView';
 import { ReferralTreeView } from './ReferralTreeView';
 import { ReferralProgramView } from './ReferralProgramView';
 import { TransactionPinSecurityView } from './TransactionPinSecurityView';
+import { DoubleProfitView } from './DoubleProfitView';
 
 interface DashboardLayoutProps {
   user: User;
@@ -97,6 +98,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<
     | 'overview'
+    | 'double_profit'
     | 'profile'
     | 'plots'
     | 'plot_visualizer'
@@ -211,9 +213,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
-  // User Dashboard Navigation Items - Hiding plot 3D, hotel shares, 7 days vacation, and site drone/cctv as requested
+  // User Dashboard Navigation Items - Featuring 12-Month Double Profit Scheme
   const navItems = [
     { id: 'overview', label: t('dashOverview'), icon: LayoutDashboard },
+    { id: 'double_profit', label: language === 'bn' ? '১২ মাসে ডাবল প্রফিট' : '12-Month Double Profit', icon: Sparkles },
     { id: 'profile', label: t('dashProfile'), icon: UserIcon },
     { id: 'plots', label: t('dashPlots'), icon: MapPin },
     { id: 'installments', label: t('dashInstallments'), icon: CreditCard },
@@ -408,6 +411,33 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                   </div>
                 )}
 
+                {/* 12-Month Double Profit Scheme Spotlight Card */}
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-700 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-5 border border-amber-400/40">
+                  <div className="space-y-1.5 max-w-xl">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/25 border border-white/20 text-xs font-black uppercase tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                      <span>{language === 'bn' ? '১২ মাসে ডাবল প্রফিট প্রকল্প (মাসিক কিস্তি)' : '12-Month Double Profit Scheme'}</span>
+                    </div>
+                    <h3 className="text-base sm:text-xl font-black tracking-tight">
+                      {language === 'bn'
+                        ? 'আমাদের কোম্পানি দিচ্ছে ১২ মাসে নিশ্চিত ডাবল প্রফিট — প্রতি মাসে মাসিক কিস্তিতে সরাসরি রিটার্ন!'
+                        : 'Our Company Delivers 2X Double Return in 12 Months — Paid in Monthly Installments!'}
+                    </h3>
+                    <p className="text-xs text-amber-50/90 leading-relaxed">
+                      {language === 'bn'
+                        ? '১০০% ব্যাংক সিকিউরিটি PDC চেক ও রেজিস্টার্ড চুক্তিপত্রের শতভাগ নিশ্চয়তা। প্রতি মাসের ১-৫ তারিখে সরাসরি আপনার হিসাবে মাসিক কিস্তির মুনাফা জমা হবে।'
+                        : '100% Backed by Bank PDC Cheques & Notarized Deed. Consecutive monthly installments directly to your account.'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('double_profit')}
+                    className="px-5 py-3 rounded-2xl bg-slate-950 hover:bg-slate-900 text-amber-400 font-black text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 shrink-0 group"
+                  >
+                    <span>{language === 'bn' ? 'ডাবল প্রফিট কিস্তি ও হিসাব দেখুন' : 'View Installment Ledger'}</span>
+                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </button>
+                </div>
+
                 {/* Plot Progress & Details Card */}
                 {activePlot && (
                   <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
@@ -474,6 +504,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 )}
 
               </div>
+            )}
+
+            {/* TAB: 12-MONTH DOUBLE PROFIT SCHEME */}
+            {activeTab === 'double_profit' && (
+              <DoubleProfitView
+                user={user}
+                language={language}
+                onRefreshData={onRefreshData}
+              />
             )}
 
             {/* TAB: PROFILE & KYC */}

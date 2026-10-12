@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, UserPlus, MapPin, Hotel, CreditCard, Car, Bell, HelpCircle, Network } from 'lucide-react';
+import { X, UserPlus, MapPin, Hotel, CreditCard, Car, Bell, HelpCircle, Network, Sparkles, CheckCircle2 } from 'lucide-react';
 import { AdminInvestor, AdminPlotItem, AdminSiteTourBooking } from '../../types/admin';
-import { ShareInvestment, SupportTicket } from '../../types';
+import { ShareInvestment, SupportTicket, DoubleProfitPlan } from '../../types';
 
 // ==========================================
 // 1. ADD INVESTOR MODAL
@@ -1108,6 +1108,269 @@ export const ReplyTicketModal: React.FC<ReplyTicketModalProps> = ({ ticket, onCl
               Send Reply & Update Ticket
             </button>
           </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// 8. ADD 12-MONTH DOUBLE PROFIT PLAN MODAL
+// ==========================================
+interface AddDoublePlanModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  investors: AdminInvestor[];
+  onAdd: (plan: Partial<DoubleProfitPlan>) => void;
+}
+
+export const AddDoublePlanModal: React.FC<AddDoublePlanModalProps> = ({
+  isOpen,
+  onClose,
+  investors,
+  onAdd
+}) => {
+  const [selectedInvestorId, setSelectedInvestorId] = useState(investors[0]?.id || '');
+  const [customMemberName, setCustomMemberName] = useState('');
+  const [customMemberId, setCustomMemberId] = useState('');
+  const [principalAmount, setPrincipalAmount] = useState<number>(500000);
+  const [customAmountStr, setCustomAmountStr] = useState<string>('500000');
+  const [packageName, setPackageName] = useState('Executive Gold Double Profit (12 Months)');
+  const [deedNo, setDeedNo] = useState(`CZS-DP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [bankPrefix, setBankPrefix] = useState('IBBL-PDC');
+
+  if (!isOpen) return null;
+
+  const selectedInv = investors.find(i => i.id === selectedInvestorId);
+  const memberName = selectedInv ? selectedInv.fullName : (customMemberName || 'Investor Member');
+  const memberId = selectedInv ? selectedInv.memberId : (customMemberId || 'CSBD-CTG-9999');
+
+  const totalReturn = principalAmount * 2;
+  const monthlyInstallment = Math.round(totalReturn / 12);
+
+  const handleSelectPackage = (amt: number, name: string) => {
+    setPrincipalAmount(amt);
+    setCustomAmountStr(String(amt));
+    setPackageName(name);
+  };
+
+  const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.replace(/\D/g, '');
+    setCustomAmountStr(val);
+    const num = Number(val) || 0;
+    setPrincipalAmount(num);
+    setPackageName(`Custom Double Return Plan (৳${num.toLocaleString()})`);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (principalAmount < 50000) {
+      alert('Minimum investment amount is BDT 50,000');
+      return;
+    }
+
+    const checkNumbers = Array.from({ length: 12 }, (_, i) => `${bankPrefix}-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000) + i}`);
+
+    onAdd({
+      memberId,
+      memberName,
+      packageName,
+      packageNameBn: `${packageName} (১২ মাসে দ্বিগুণ মুনাফা)`,
+      principalAmount,
+      totalReturnAmount: totalReturn,
+      monthlyInstallmentAmount: monthlyInstallment,
+      totalMonths: 12,
+      paidInstallments: 0,
+      remainingInstallments: 12,
+      totalPaidOut: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      nextPayoutDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'active',
+      agreementDeedNo: deedNo,
+      pdcCheckNumbers: checkNumbers
+    });
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-500" />
+            <div>
+              <h3 className="text-base font-bold text-white">Enroll Investor in 12-Month Double Profit Plan</h3>
+              <span className="text-xs text-amber-400 font-mono">100% Net Profit Disbursed in 12 Equal Monthly Installments</span>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-lg bg-slate-800 text-slate-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+          
+          {/* Select Existing Investor or Enter Custom */}
+          <div>
+            <label className="block text-slate-300 font-semibold mb-1">Select Registered CRM Investor</label>
+            <select
+              value={selectedInvestorId}
+              onChange={e => {
+                setSelectedInvestorId(e.target.value);
+                setCustomMemberName('');
+              }}
+              className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white"
+            >
+              <option value="">-- Choose Investor from CRM or Enter Custom Below --</option>
+              {investors.map(inv => (
+                <option key={inv.id} value={inv.id}>
+                  {inv.fullName} ({inv.memberId}) · Phone: {inv.phone}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {!selectedInvestorId && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">Custom Member Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={customMemberName}
+                  onChange={e => setCustomMemberName(e.target.value)}
+                  placeholder="e.g. Md. Rafiqul Islam"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">Custom Member ID *</label>
+                <input
+                  type="text"
+                  required
+                  value={customMemberId}
+                  onChange={e => setCustomMemberId(e.target.value)}
+                  placeholder="e.g. CSBD-DHK-9812"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Preset Packages */}
+          <div>
+            <label className="block text-slate-300 font-semibold mb-1.5">Choose Capital Package</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[
+                { amount: 100000, name: 'Starter Double Profit (৳১,০০,০০০)' },
+                { amount: 250000, name: 'Silver Wealth Booster (৳২,৫০,০০০)' },
+                { amount: 500000, name: 'Executive Gold Double Profit (৳৫,০০,০০০)' },
+                { amount: 1000000, name: 'Platinum 2X Elite (৳১০,০০,০০০)' },
+                { amount: 2500000, name: 'Crown VIP Double Return (৳২৫,০০,০০০)' },
+                { amount: 5000000, name: 'Presidential Diamond (৳৫০,০০,০০০)' }
+              ].map(p => (
+                <button
+                  key={p.amount}
+                  type="button"
+                  onClick={() => handleSelectPackage(p.amount, p.name)}
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
+                    principalAmount === p.amount
+                      ? 'border-amber-500 bg-amber-500/20 text-white ring-1 ring-amber-500'
+                      : 'border-slate-800 bg-slate-800/60 text-slate-300'
+                  }`}
+                >
+                  <strong className="block text-xs font-mono">৳{p.amount.toLocaleString()}</strong>
+                  <span className="text-[10px] text-emerald-400 block mt-0.5">2X: ৳{(p.amount * 2).toLocaleString()}</span>
+                  <span className="text-[10px] text-amber-300 block font-mono">৳{Math.round((p.amount * 2) / 12).toLocaleString()}/mo</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom Amount */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-slate-300 font-semibold mb-1">Or Custom Capital Amount (BDT) *</label>
+              <input
+                type="text"
+                required
+                value={customAmountStr}
+                onChange={handleCustomChange}
+                placeholder="500000"
+                className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white font-mono font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 font-semibold mb-1">Package Title</label>
+              <input
+                type="text"
+                value={packageName}
+                onChange={e => setPackageName(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white"
+              />
+            </div>
+          </div>
+
+          {/* Live Calculation Preview */}
+          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-center">
+            <div>
+              <span className="text-[10px] text-slate-400 font-sans block">Invested Principal</span>
+              <strong className="text-white text-xs">৳{principalAmount.toLocaleString()}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 font-sans block">100% Net Profit</span>
+              <strong className="text-emerald-400 text-xs">+৳{principalAmount.toLocaleString()}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 font-sans block">Total 12-Mo Payout</span>
+              <strong className="text-amber-400 text-xs">৳{totalReturn.toLocaleString()}</strong>
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 font-sans block">Monthly Installment</span>
+              <strong className="text-emerald-300 text-xs font-black">৳{monthlyInstallment.toLocaleString()} / mo</strong>
+            </div>
+          </div>
+
+          {/* Deed & PDC Prefix */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-slate-300 font-semibold mb-1">Agreement Deed Number</label>
+              <input
+                type="text"
+                value={deedNo}
+                onChange={e => setDeedNo(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white font-mono"
+              />
+            </div>
+            <div>
+              <label className="block text-slate-300 font-semibold mb-1">12 Bank PDC Cheques Prefix</label>
+              <input
+                type="text"
+                value={bankPrefix}
+                onChange={e => setBankPrefix(e.target.value)}
+                placeholder="IBBL-PDC / CBL-PDC"
+                className="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 text-white font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 font-semibold"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-black shadow-md flex items-center gap-1.5"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Enroll Plan & Generate 12 PDC Cheques</span>
+            </button>
+          </div>
+
         </form>
       </div>
     </div>

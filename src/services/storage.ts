@@ -9,7 +9,8 @@ import {
   ProjectInfo,
   NoticeItem,
   VacationBooking,
-  ReferralSignup
+  ReferralSignup,
+  DoubleProfitPlan
 } from '../types';
 import {
   AdminInvestor,
@@ -900,6 +901,47 @@ export const INITIAL_AUDIT_LOGS: AdminAuditLog[] = [
   }
 ];
 
+export const INITIAL_DOUBLE_PROFIT_PLANS: DoubleProfitPlan[] = [
+  {
+    id: 'dplan-8842-1',
+    memberId: 'CSBD-CTG-8842',
+    memberName: 'Ziabul Hoque Chowdhury',
+    packageName: 'Executive Gold Double Profit (12 Months)',
+    packageNameBn: 'গোল্ড প্যাকেজ: ১২ মাসে দ্বিগুণ নিশ্চিত মুনাফা',
+    principalAmount: 500000,
+    totalReturnAmount: 1000000, // 2x principal in 12 months
+    monthlyInstallmentAmount: 83333,
+    totalMonths: 12,
+    paidInstallments: 5,
+    remainingInstallments: 7,
+    totalPaidOut: 416665,
+    startDate: '2026-05-01',
+    nextPayoutDate: '2026-11-01',
+    status: 'active',
+    agreementDeedNo: 'CZS-DP-2026-8842-A',
+    pdcCheckNumbers: ['IBBL-PDC-092141', 'IBBL-PDC-092142', 'IBBL-PDC-092143', 'IBBL-PDC-092144', 'IBBL-PDC-092145', 'IBBL-PDC-092146', 'IBBL-PDC-092147']
+  },
+  {
+    id: 'dplan-9021-2',
+    memberId: 'CSBD-CTG-9021',
+    memberName: 'Md. Anwar Hossain',
+    packageName: 'Silver Wealth Booster (12 Months)',
+    packageNameBn: 'সিলভার প্যাকেজ: ১২ মাসে দ্বিগুণ কিস্তিভিত্তিক মুনাফা',
+    principalAmount: 250000,
+    totalReturnAmount: 500000,
+    monthlyInstallmentAmount: 41666,
+    totalMonths: 12,
+    paidInstallments: 3,
+    remainingInstallments: 9,
+    totalPaidOut: 124998,
+    startDate: '2026-07-01',
+    nextPayoutDate: '2026-11-01',
+    status: 'active',
+    agreementDeedNo: 'CZS-DP-2026-9021-B',
+    pdcCheckNumbers: ['CBL-PDC-441021', 'CBL-PDC-441022', 'CBL-PDC-441023']
+  }
+];
+
 export const INITIAL_REFERRAL_SIGNUPS: ReferralSignup[] = [
   {
     id: 'ref-101',
@@ -1070,6 +1112,7 @@ const STORAGE_KEYS = {
   TRANSFER_REQUESTS: 'csbd_transfer_requests_enc',
   AUDIT_LOGS: 'csbd_audit_logs_enc',
   REFERRAL_SIGNUPS: 'csbd_referral_signups_enc',
+  DOUBLE_PROFIT_PLANS: 'csbd_double_profit_plans_enc',
   THEME: 'csbd_theme_preference',
   LANGUAGE: 'csbd_lang_preference',
   LAST_SYNC: 'csbd_last_cloud_sync'
@@ -1246,6 +1289,9 @@ export class StorageService {
     if (!localStorage.getItem(STORAGE_KEYS.REFERRAL_SIGNUPS)) {
       localStorage.setItem(STORAGE_KEYS.REFERRAL_SIGNUPS, encryptPayload(INITIAL_REFERRAL_SIGNUPS));
     }
+    if (!localStorage.getItem(STORAGE_KEYS.DOUBLE_PROFIT_PLANS)) {
+      localStorage.setItem(STORAGE_KEYS.DOUBLE_PROFIT_PLANS, encryptPayload(INITIAL_DOUBLE_PROFIT_PLANS));
+    }
     if (!localStorage.getItem(STORAGE_KEYS.LAST_SYNC)) {
       localStorage.setItem(STORAGE_KEYS.LAST_SYNC, new Date().toISOString());
     }
@@ -1368,6 +1414,118 @@ export class StorageService {
     const filtered = shares.filter(s => s.id !== id);
     if (filtered.length !== shares.length) {
       localStorage.setItem(STORAGE_KEYS.SHARES, encryptPayload(filtered));
+      this.updateLastSync();
+      return true;
+    }
+    return false;
+  }
+
+  // --- 12-MONTH DOUBLE PROFIT PLANS CRUD & MONTHLY INSTALLMENT DISBURSEMENT ---
+  static getDoubleProfitPlans(): DoubleProfitPlan[] {
+    this.ensureDataInitialized();
+    return decryptPayload<DoubleProfitPlan[]>(localStorage.getItem(STORAGE_KEYS.DOUBLE_PROFIT_PLANS), INITIAL_DOUBLE_PROFIT_PLANS);
+  }
+
+  static createDoubleProfitPlan(plan: Partial<DoubleProfitPlan>): DoubleProfitPlan {
+    const plans = this.getDoubleProfitPlans();
+    const user = this.getUser() || INITIAL_USER;
+    const principal = plan.principalAmount || 100000;
+    const totalReturn = principal * 2; // Guaranteed 2x Double Profit in 12 Months
+    const monthlyInstallment = Math.round(totalReturn / 12);
+    
+    const newPlan: DoubleProfitPlan = {
+      id: plan.id || 'dplan-' + Date.now(),
+      memberId: plan.memberId || user.memberId,
+      memberName: plan.memberName || user.fullName,
+      packageName: plan.packageName || `৳${principal.toLocaleString()} 12-Month Double Return Plan`,
+      packageNameBn: plan.packageNameBn || `৳${principal.toLocaleString()} ১২ মাসে ডাবল প্রফিট প্রকল্প`,
+      principalAmount: principal,
+      totalReturnAmount: totalReturn,
+      monthlyInstallmentAmount: monthlyInstallment,
+      totalMonths: 12,
+      paidInstallments: 0,
+      remainingInstallments: 12,
+      totalPaidOut: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      nextPayoutDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'active',
+      agreementDeedNo: 'CZS-DP-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000),
+      pdcCheckNumbers: Array.from({ length: 12 }, (_, i) => `IBBL-PDC-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000) + i}`)
+    };
+
+    const updated = [newPlan, ...plans];
+    localStorage.setItem(STORAGE_KEYS.DOUBLE_PROFIT_PLANS, encryptPayload(updated));
+
+    // Also record transaction
+    const tx: TransactionRecord = {
+      id: 'tx-dp-' + Date.now(),
+      date: new Date().toISOString().split('T')[0],
+      title: `Double Profit Plan Activation - ${newPlan.packageName}`,
+      titleBn: `১২ মাসে দ্বিগুণ মুনাফা প্রকল্প সক্রিয়করণ`,
+      category: 'booking',
+      amount: principal,
+      type: 'debit',
+      status: 'completed',
+      method: 'Online Investment Wallet',
+      referenceNo: newPlan.agreementDeedNo
+    };
+    const txs = this.getTransactions();
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, encryptPayload([tx, ...txs]));
+
+    this.addAuditLog('DOUBLE_PROFIT_PLAN_CREATED', newPlan.packageName, `User ${newPlan.memberName} enrolled in ৳${principal.toLocaleString()} 12-month double return plan.`);
+    this.updateLastSync();
+    return newPlan;
+  }
+
+  static disburseDoubleProfitInstallment(planId: string): { success: boolean; installmentAmount: number; message: string } | null {
+    const plans = this.getDoubleProfitPlans();
+    const idx = plans.findIndex(p => p.id === planId);
+    if (idx === -1) return null;
+
+    const plan = plans[idx];
+    if (plan.remainingInstallments <= 0 || plan.status === 'completed') {
+      return { success: false, installmentAmount: 0, message: 'Plan is already fully disbursed.' };
+    }
+
+    const installmentAmt = plan.monthlyInstallmentAmount;
+    plan.paidInstallments += 1;
+    plan.remainingInstallments -= 1;
+    plan.totalPaidOut += installmentAmt;
+    if (plan.remainingInstallments === 0) {
+      plan.status = 'completed';
+    }
+
+    // Set next payout date 30 days ahead
+    plan.nextPayoutDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    localStorage.setItem(STORAGE_KEYS.DOUBLE_PROFIT_PLANS, encryptPayload(plans));
+
+    // Record credit transaction to member's account
+    const payoutTx: TransactionRecord = {
+      id: 'tx-payout-' + Date.now(),
+      date: new Date().toISOString().split('T')[0],
+      title: `Monthly Double Profit Installment #${plan.paidInstallments}/12 - ${plan.packageName}`,
+      titleBn: `১২ মাসে ডাবল প্রফিট মাসিক কিস্তি #${plan.paidInstallments}/১২ বণ্টন`,
+      category: 'dividend',
+      amount: installmentAmt,
+      type: 'credit',
+      status: 'completed',
+      method: 'Monthly Auto Installment Credit',
+      referenceNo: `DP-INS-${plan.paidInstallments}-${Math.floor(1000 + Math.random() * 9000)}`
+    };
+    const currentTxs = this.getTransactions();
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, encryptPayload([payoutTx, ...currentTxs]));
+
+    this.addAuditLog('DOUBLE_PROFIT_INSTALLMENT_DISBURSED', plan.packageName, `Disbursed installment #${plan.paidInstallments} of ৳${installmentAmt.toLocaleString()} to ${plan.memberName}`);
+    this.updateLastSync();
+    return { success: true, installmentAmount: installmentAmt, message: `Installment #${plan.paidInstallments} of ৳${installmentAmt.toLocaleString()} disbursed successfully!` };
+  }
+
+  static deleteDoubleProfitPlan(planId: string): boolean {
+    const plans = this.getDoubleProfitPlans();
+    const filtered = plans.filter(p => p.id !== planId);
+    if (filtered.length !== plans.length) {
+      localStorage.setItem(STORAGE_KEYS.DOUBLE_PROFIT_PLANS, encryptPayload(filtered));
       this.updateLastSync();
       return true;
     }

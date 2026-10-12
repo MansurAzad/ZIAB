@@ -226,3 +226,24 @@ export interface VacationBooking {
   confirmationCode: string;
   createdAt: string;
 }
+
+export interface DoubleProfitPlan {
+  id: string;
+  memberId: string;
+  memberName: string;
+  packageName: string;
+  packageNameBn: string;
+  principalAmount: number;
+  totalReturnAmount: number; // 2x principal in 12 months
+  monthlyInstallmentAmount: number; // totalReturnAmount / 12
+  totalMonths: number; // 12
+  paidInstallments: number;
+  remainingInstallments: number;
+  totalPaidOut: number;
+  startDate: string;
+  nextPayoutDate: string;
+  status: 'active' | 'completed' | 'pending';
+  agreementDeedNo: string;
+  pdcCheckNumbers: string[];
+}
+

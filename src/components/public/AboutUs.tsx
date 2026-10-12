@@ -119,10 +119,10 @@ export const AboutUs: React.FC<AboutUsProps> = ({
     },
     {
       icon: Sparkles,
-      title: isBn ? 'মাসিক নিশ্চিত মুনাফা' : 'Guaranteed Returns',
+      title: isBn ? '১২ মাসে ডাবল প্রফিট প্রকল্প' : '12-Month Double Profit Scheme',
       desc: isBn
-        ? 'হোটেল ও রিসোর্ট শেয়ারে প্রতিমাসে সরাসরি ব্যাংক অ্যাকাউন্টে নিশ্চিত ভাড়া ও লভ্যাংশ।'
-        : 'High-yield monthly rental distributions credited automatically to investor bank accounts.'
+        ? '১২ মাসে নিশ্চিত দ্বিগুণ রিটার্ন (১০০% নিট মুনাফা), যা প্রতি মাসে সমান কিস্তি আকারে সরাসরি আপনার ব্যাংক বা ওয়ালেটে পরিশোধ করা হয়।'
+        : 'Guaranteed 2X return in 12 months (100% net profit), disbursed consecutively in 12 equal monthly installments directly into your bank or wallet.'
     },
     {
       icon: Users,
