@@ -91,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
               <div>
                 <span className="font-extrabold tracking-tight text-lg sm:text-xl text-slate-900 dark:text-white block leading-tight">
-                  CITY ZONE <span className="text-amber-600 dark:text-amber-500">SQUARE</span>
+                  ZONE <span className="text-amber-600 dark:text-amber-500">SQUARE</span>
                 </span>
                 <span className="text-[10px] tracking-wider uppercase font-semibold text-slate-600 dark:text-slate-300 block -mt-0.5">
                   Real Estate & Investment

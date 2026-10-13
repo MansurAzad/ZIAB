@@ -80,7 +80,7 @@ export const DepositSlipUploadView: React.FC<DepositSlipUploadViewProps> = ({
           <p className="text-xs text-slate-500">
             {language === 'bn'
               ? 'ব্যাংকে নগদ জমা বা চেকে কিস্তি পরিশোধের পর মানি রসিদের ছবি আপলোড করে একাউন্টস থেকে দ্রুত অনুমোদন নিন।'
-              : 'Upload scanned bank deposit counterfoils or cheques for instant reconciliation by CITY ZONE SQUARE accounts department.'}
+              : 'Upload scanned bank deposit counterfoils or cheques for instant reconciliation by ZONE SQUARE accounts department.'}
           </p>
         </div>
 

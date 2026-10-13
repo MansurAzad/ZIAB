@@ -24,14 +24,14 @@ export const Footer: React.FC<FooterProps> = ({ language, onNavigate, onOpenAuth
                 <Building2 className="w-5 h-5" />
               </div>
               <span className="font-extrabold text-white text-lg tracking-tight">
-                CITY ZONE <span className="text-amber-500">SQUARE</span>
+                ZONE <span className="text-amber-500">SQUARE</span>
               </span>
             </div>
             
             <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
               {language === 'bn'
-                ? 'সিটি জোন স্কয়ার রিয়েল এস্টেট খাতের একটি শীর্ষস্থানীয় প্রতিষ্ঠান। আধুনিক বাসস্থান, পরিকল্পিত টাউনশিপ ও লাভজনক হোটেল শেয়ার বিনিয়োগে বিশ্বস্ত অংশীদার।'
-                : 'CITY ZONE SQUARE is a premier corporate developer in Bangladesh delivering 100% dispute-free residential plots, master-planned townships, and high-yield hospitality investments.'}
+                ? 'জোন স্কয়ার রিয়েল এস্টেট খাতের একটি শীর্ষস্থানীয় প্রতিষ্ঠান। আধুনিক বাসস্থান, ১২ মাসে নিশ্চিত ডাবল প্রফিট প্রকল্প ও লাভজনক শেয়ার বিনিয়োগে বিশ্বস্ত অংশীদার।'
+                : 'ZONE SQUARE is a premier corporate developer in Bangladesh delivering 12-month double return investment schemes, master-planned developments, and high-yield hospitality investments.'}
             </p>
 
             <div className="flex items-center gap-2 text-slate-500 text-[11px]">
@@ -126,7 +126,7 @@ export const Footer: React.FC<FooterProps> = ({ language, onNavigate, onOpenAuth
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
-          <p>© 2026 City Square BD Limited. All rights reserved.</p>
+          <p>© 2026 ZONE SQUARE Limited. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <span>Privacy Policy</span>
             <span>Terms of Allotment</span>

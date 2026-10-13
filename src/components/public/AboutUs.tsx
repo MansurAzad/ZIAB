@@ -35,34 +35,34 @@ export const AboutUs: React.FC<AboutUsProps> = ({
       nameBn: 'জনাব রিপন হোসেন',
       role: 'Chairman',
       roleBn: 'চেয়ারম্যান',
-      company: 'City Zone Square Real Estate Limited',
-      companyBn: 'সিটি জোন স্কয়ার রিয়েল এস্টেট লিমিটেড',
+      company: 'Zone Square Real Estate Limited',
+      companyBn: 'জোন স্কয়ার রিয়েল এস্টেট লিমিটেড',
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
       message:
-        'Our core philosophy has always been transparency, legal integrity, and sustainable wealth creation. At City Zone Square, we do not merely sell plots or shares; we build generations of trust and lasting family heritage across Bangladesh.',
+        'Our core philosophy has always been transparency, legal integrity, and sustainable wealth creation. At Zone Square, we do not merely sell plots or shares; we build generations of trust and lasting family heritage across Bangladesh.',
       messageBn:
-        'আমাদের মূল দর্শন হলো সততা, শতভাগ আইনগত নিরাপত্তা এবং দীর্ঘমেয়াদী সম্পদ সৃষ্টি। সিটি জোন স্কয়ারে আমরা কেবল জমি বা শেয়ার বিক্রি করি না; আমরা প্রতিটি বিনিয়োগকারী পরিবারের ভবিষ্যৎ নিরাপত্তা ও প্রজন্ম থেকে প্রজন্মের আস্থা গড়ে তুলি।'
+        'আমাদের মূল দর্শন হলো সততা, শতভাগ আইনগত নিরাপত্তা এবং দীর্ঘমেয়াদী সম্পদ সৃষ্টি। জোন স্কয়ারে আমরা প্রতিটি বিনিয়োগকারী পরিবারের ভবিষ্যৎ নিরাপত্তা ও প্রজন্ম থেকে প্রজন্মের আস্থা গড়ে তুলি।'
     },
     {
       name: 'Mr. H. M. Ziaur Rahman',
       nameBn: 'জনাব এইচ. এম. জিয়াউর রহমান',
       role: 'Managing Director',
       roleBn: 'ব্যবস্থাপনা পরিচালক',
-      company: 'City Zone Square Real Estate Limited',
-      companyBn: 'সিটি জোন স্কয়ার রিয়েল এস্টেট লিমিটেড',
+      company: 'Zone Square Real Estate Limited',
+      companyBn: 'জোন স্কয়ার রিয়েল এস্টেট লিমিটেড',
       image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&auto=format&fit=crop&q=80',
       message:
         'We are determined to pioneer world-class planned urbanization in Purbachal and scenic tourist resort developments in Kuakata and Cox\'s Bazar. Our commitment is timely project execution, zero legal flaws, and guaranteed returns for our valued investors.',
       messageBn:
-        'পূর্বাচলে পরিকল্পিত আধুনিক উপশহর এবং কুয়াকাটা ও কক্সবাজারে আন্তর্জাতিক মানের পর্যটন রিসোর্ট প্রকল্প গড়ে তুলতে আমরা প্রতিশ্রুতিবদ্ধ। নির্দিষ্ট সময়ে প্রকল্প হস্তান্তর, নির্ভেজাল আইনি কাগজপত্র এবং বিনিয়োগকারীদের লাভবান করাই আমাদের অঙ্গীকার।'
+        'আন্তর্জাতিক মানের পর্যটন রিসোর্ট প্রকল্প ও ১২ মাসের ডাবল প্রফিট প্রকল্প সফলভাবে পরিচালনা করতে আমরা প্রতিশ্রুতিবদ্ধ। নির্দিষ্ট সময়ে কিস্তি বণ্টন, নির্ভেজাল আইনি কাগজপত্র এবং বিনিয়োগকারীদের লাভবান করাই আমাদের অঙ্গীকার।'
     },
     {
       name: 'Mr. Uttam Saha',
       nameBn: 'জনাব উত্তম সাহা',
       role: 'Marketing Director',
       roleBn: 'মার্কেটিং ডিরেক্টর',
-      company: 'City Zone Square Real Estate Limited',
-      companyBn: 'সিটি জোন স্কয়ার রিয়েল এস্টেট লিমিটেড',
+      company: 'Zone Square Real Estate Limited',
+      companyBn: 'জোন স্কয়ার রিয়েল এস্টেট লিমিটেড',
       image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
       message:
         'Customer satisfaction and transparent communication define our investor relationships. Whether for small fractional hotel shares or large residential estates, we offer bespoke guidance and unwavering post-purchase service.',
@@ -144,7 +144,7 @@ export const AboutUs: React.FC<AboutUsProps> = ({
             <span>{isBn ? 'আমাদের পরিচিতি ও অঙ্গীকার' : 'Corporate Profile & Vision'}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            {isBn ? 'সিটি স্কয়ার রিয়েল এস্টেট লিমিটেড' : 'City Square Real Estate Limited'}
+            {isBn ? 'জোন স্কয়ার রিয়েল এস্টেট লিমিটেড' : 'ZONE SQUARE Real Estate Limited'}
           </h2>
           <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
             {isBn

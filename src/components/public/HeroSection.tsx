@@ -45,7 +45,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         
         {/* Unboxed Kicker */}
         <div className="flex flex-wrap items-center gap-2 text-xs text-amber-400 font-semibold tracking-wide uppercase mb-3">
-          <span>CITY ZONE SQUARE</span>
+          <span>ZONE SQUARE</span>
           <span aria-hidden="true">·</span>
           <span>Official Investor Portal</span>
           <span aria-hidden="true">·</span>

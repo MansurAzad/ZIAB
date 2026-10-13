@@ -6,7 +6,7 @@ import { formatBDT } from '../../services/i18n';
 interface CertificateViewerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: 'plot_allotment' | 'hotel_share';
+  type: 'plot_allotment' | 'hotel_share' | 'double_profit_deed';
   user: User;
   plot?: PlotBooking;
   share?: ShareInvestment;
@@ -37,7 +37,11 @@ export const CertificateViewerModal: React.FC<CertificateViewerModalProps> = ({
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-amber-400" />
             <span className="text-xs font-bold uppercase tracking-wider text-amber-200">
-              {type === 'plot_allotment' ? 'Official Plot Allotment Letter' : 'Fractional Ownership Share Certificate'}
+              {type === 'double_profit_deed'
+                ? 'Official 12-Month Double Return Investment Deed'
+                : type === 'plot_allotment'
+                ? 'Official Allotment Letter'
+                : 'Fractional Ownership Share Certificate'}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -75,83 +79,78 @@ export const CertificateViewerModal: React.FC<CertificateViewerModalProps> = ({
                 <Building2 className="w-8 h-8 text-amber-700 dark:text-amber-400" />
               </div>
               <h1 className="text-xl sm:text-2xl font-extrabold tracking-widest text-amber-950 dark:text-amber-200 uppercase">
-                CITY SQUARE BD LIMITED
+                ZONE SQUARE LIMITED
               </h1>
               <p className="text-xs font-sans text-slate-500 dark:text-slate-400 tracking-wider uppercase mt-0.5">
-                Government Registered Corporate Real Estate & Hospitality Developer · Dhaka & Chattogram
+                Government Registered Corporate Real Estate & Investment Enterprise · Dhaka & Chattogram
               </p>
               <p className="text-[11px] font-sans text-slate-400 font-mono mt-1">
-                Ref No: {type === 'plot_allotment' ? plot?.allotmentLetterNo : share?.certificateNo}
+                Ref No: {type === 'double_profit_deed' ? 'ZS-DP-2026-DEED' : type === 'plot_allotment' ? plot?.allotmentLetterNo : share?.certificateNo}
               </p>
             </div>
 
             {/* Title */}
             <div className="text-center py-6">
               <h2 className="text-lg sm:text-xl font-bold uppercase tracking-widest text-slate-900 dark:text-white underline decoration-amber-600 underline-offset-8">
-                {type === 'plot_allotment'
-                  ? 'CERTIFICATE OF PLOT ALLOTMENT'
+                {type === 'double_profit_deed'
+                  ? 'CERTIFICATE OF 12-MONTH DOUBLE PROFIT INVESTMENT'
+                  : type === 'plot_allotment'
+                  ? 'CERTIFICATE OF CORPORATE ALLOTMENT'
                   : 'CERTIFICATE OF FRACTIONAL RESORT OWNERSHIP'}
               </h2>
               <p className="text-xs italic text-slate-500 dark:text-slate-400 mt-2 font-sans">
-                Issued in accordance with the Real Estate Development and Management Act & Sub-Registry Standards
+                Issued in accordance with the Statutory Investment Agreement & Section 138 NI Act Security Compliance
               </p>
             </div>
 
             {/* Document Details */}
-            {type === 'plot_allotment' && plot ? (
+            {type === 'double_profit_deed' ? (
               <div className="font-sans text-xs sm:text-sm text-slate-700 dark:text-slate-300 space-y-4 leading-relaxed">
                 <p>
-                  This is to solemnly certify that <strong className="text-slate-900 dark:text-white">{user.fullName}</strong> (Member ID: <span className="font-mono">{user.memberId}</span>), National ID: <span className="font-mono">{user.nidNo}</span>, residing at {user.address}, {user.city}, has been officially allotted residential land in our signature development:
+                  This is to certify that <strong className="text-slate-900 dark:text-white">{user.fullName}</strong> (Member ID: <span className="font-mono">{user.memberId}</span>) is an enrolled investor in the official <strong>ZONE SQUARE 12-Month Double Profit Scheme</strong>.
                 </p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-amber-50/50 dark:bg-slate-800/60 border border-amber-200/50 dark:border-amber-800/50 text-xs">
                   <div>
-                    <span className="text-slate-500 block">Project:</span>
-                    <strong className="text-slate-900 dark:text-white">{plot.projectName}</strong>
+                    <span className="text-slate-500 block">Investment Package:</span>
+                    <strong className="text-slate-900 dark:text-white">Executive Gold 12-Mo 2X</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Sector & Road:</span>
-                    <strong className="text-slate-900 dark:text-white">{plot.sector}, {plot.roadNo}</strong>
+                    <span className="text-slate-500 block">Capital Invested:</span>
+                    <strong className="text-slate-900 dark:text-white font-mono">৳5,00,000</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Plot Number:</span>
-                    <strong className="text-amber-700 dark:text-amber-400 font-bold text-sm">#{plot.plotNo} ({plot.katha} Katha)</strong>
+                    <span className="text-slate-500 block">Total 2X Payout:</span>
+                    <strong className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">৳10,00,000</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Facing / Orientation:</span>
-                    <strong className="text-slate-900 dark:text-white">{plot.facing}</strong>
+                    <span className="text-slate-500 block">Monthly Installment:</span>
+                    <strong className="text-amber-700 dark:text-amber-400 font-bold font-mono">৳83,333 / mo</strong>
                   </div>
                 </div>
 
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg text-xs text-emerald-800 dark:text-emerald-200">
+                  <strong>Security Guarantee:</strong> Fully secured by 12 official post-dated bank cheques (PDC) and registered legal deed. Monthly installments disbursed consecutively across 12 months.
+                </div>
+              </div>
+            ) : type === 'plot_allotment' && plot ? (
+              <div className="font-sans text-xs sm:text-sm text-slate-700 dark:text-slate-300 space-y-4 leading-relaxed">
+                <p>
+                  This is to solemnly certify that <strong className="text-slate-900 dark:text-white">{user.fullName}</strong> (Member ID: <span className="font-mono">{user.memberId}</span>) holds active allocation in ZONE SQUARE:
+                </p>
                 <div className="flex justify-between items-center text-xs p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
-                  <span>Total Allotment Consideration: <strong>{formatBDT(plot.totalCost, language)}</strong></span>
+                  <span>Total Consideration: <strong>{formatBDT(plot.totalCost, language)}</strong></span>
                   <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Total Paid to Date: {formatBDT(plot.paidAmount, language)}</span>
                 </div>
               </div>
             ) : share ? (
               <div className="font-sans text-xs sm:text-sm text-slate-700 dark:text-slate-300 space-y-4 leading-relaxed">
                 <p>
-                  This is to certify that <strong className="text-slate-900 dark:text-white">{user.fullName}</strong> is the verified lawful holder of <strong>{share.shareUnits} (Two)</strong> fractional ownership suite unit shares in:
+                  This is to certify that <strong className="text-slate-900 dark:text-white">{user.fullName}</strong> is the verified lawful holder of <strong>{share.shareUnits} (Two)</strong> fractional ownership suite unit shares in ZONE SQUARE developments.
                 </p>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-amber-50/50 dark:bg-slate-800/60 border border-amber-200/50 dark:border-amber-800/50 text-xs">
-                  <div>
-                    <span className="text-slate-500 block">Project:</span>
-                    <strong className="text-slate-900 dark:text-white">{share.projectName}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Share Unit IDs:</span>
-                    <strong className="text-amber-700 dark:text-amber-400 font-bold font-mono">{share.shareNumbers.join(', ')}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Total Investment:</span>
-                    <strong className="text-slate-900 dark:text-white">{formatBDT(share.totalInvestment, language)}</strong>
-                  </div>
+                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs font-mono">
+                  Total Investment: {formatBDT(share.totalInvestment, language)}
                 </div>
-
-                <p className="text-xs text-slate-500">
-                  Entitlements: Guaranteed monthly commercial dividend yield of 18.5% p.a., 7 days complimentary annual family suite stay, and perpetual sub-registry undivided title.
-                </p>
               </div>
             ) : null}
 
@@ -162,14 +161,14 @@ export const CertificateViewerModal: React.FC<CertificateViewerModalProps> = ({
                   M. Rahman
                 </div>
                 <span className="block font-semibold">Md. Mokhlesur Rahman</span>
-                <span className="text-[10px] text-slate-400">Head of Legal Affairs & Allotment</span>
+                <span className="text-[10px] text-slate-400">Head of Legal Affairs</span>
               </div>
 
               {/* Verified Digital Seal */}
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 rounded-full border-2 border-dashed border-emerald-600 flex items-center justify-center p-1 text-center">
                   <span className="text-[8px] font-bold text-emerald-600 uppercase tracking-tighter block leading-tight">
-                    GOVT. VETTED<br />SEAL OF TRUST<br />CSBD
+                    GOVT. VETTED<br />SEAL OF TRUST<br />ZONE SQ
                   </span>
                 </div>
                 <span className="text-[10px] text-emerald-600 font-semibold mt-1">100% DISPUTE FREE</span>
@@ -180,7 +179,7 @@ export const CertificateViewerModal: React.FC<CertificateViewerModalProps> = ({
                   A. Chowdhury
                 </div>
                 <span className="block font-semibold">Managing Director</span>
-                <span className="text-[10px] text-slate-400">City Square BD Limited</span>
+                <span className="text-[10px] text-slate-400">ZONE SQUARE LIMITED</span>
               </div>
             </div>
 

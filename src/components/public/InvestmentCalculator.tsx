@@ -442,7 +442,7 @@ export const InvestmentCalculator: React.FC<InvestmentCalculatorProps> = ({
 
                   <div className="text-[11px] text-slate-300 italic flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Backed by CITY ZONE SQUARE guaranteed corporate buyback & handover guarantee.</span>
+                    <span>Backed by ZONE SQUARE guaranteed corporate buyback & handover guarantee.</span>
                   </div>
                 </div>
 

@@ -86,8 +86,8 @@ export const MemberTransferView: React.FC<MemberTransferViewProps> = ({
           </h2>
           <p className="text-xs text-slate-500">
             {language === 'bn'
-              ? 'সিটি জোন স্কয়ারের অন্য যেকোনো রেজিস্টার্ড বিনিয়োগকারীকে লভ্যাংশ বা কমিশন ব্যালেন্স তাৎক্ষণিক ট্রান্সফার করুন।'
-              : 'Transfer wallet funds to another verified member ID or investor account within CITY ZONE SQUARE using your 4-digit Transaction PIN.'}
+              ? 'জোন স্কয়ারের অন্য যেকোনো রেজিস্টার্ড বিনিয়োগকারীকে লভ্যাংশ বা কমিশন ব্যালেন্স তাৎক্ষণিক ট্রান্সফার করুন।'
+              : 'Transfer wallet funds to another verified member ID or investor account within ZONE SQUARE using your 4-digit Transaction PIN.'}
           </p>
         </div>
 

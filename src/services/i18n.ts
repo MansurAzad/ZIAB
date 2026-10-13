@@ -3,7 +3,7 @@ import { Language } from '../types';
 export const translations = {
   en: {
     // Brand
-    brandName: 'CITY ZONE SQUARE',
+    brandName: 'ZONE SQUARE',
     brandTagline: 'Secure Real Estate & Fractional Investment',
     
     // Nav
@@ -138,7 +138,7 @@ export const translations = {
 
     // Payment Gateway Modal
     modalPayTitle: 'Secure Payment Gateway',
-    modalPayDesc: 'Authorized payment integration for CITY ZONE SQUARE installment clearance.',
+    modalPayDesc: 'Authorized payment integration for ZONE SQUARE installment clearance.',
     selectPaymentMethod: 'Select Payment Channel',
     bKashWallet: 'bKash Merchant Pay',
     nagadWallet: 'Nagad Direct',
@@ -155,7 +155,7 @@ export const translations = {
     verifiedStamp: 'GOVT. SUB-REGISTRY & RAJUK COMPLIANT',
 
     // Glance Widget
-    glanceTitle: 'CITY ZONE SQUARE Portfolio Glance',
+    glanceTitle: 'ZONE SQUARE Portfolio Glance',
     glanceNextDue: 'Next Due',
     glanceDividend: 'Monthly Dividend',
     glanceSynced: 'Cloud Synced',
@@ -168,7 +168,7 @@ export const translations = {
   },
   bn: {
     // Brand
-    brandName: 'সিটি জোন স্কয়ার',
+    brandName: 'জোন স্কয়ার',
     brandTagline: 'নিরাপদ রিয়েল এস্টেট ও শেয়ার বিনিয়োগ',
     
     // Nav

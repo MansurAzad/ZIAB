@@ -779,7 +779,7 @@ export const DoubleProfitView: React.FC<DoubleProfitViewProps> = ({
                   GOVERNMENT OF THE PEOPLE'S REPUBLIC OF BANGLADESH · NON-JUDICIAL STAMP
                 </span>
                 <h4 className="text-lg font-black text-slate-900 dark:text-white mt-1">
-                  CITY ZONE SQUARE REAL ESTATE LIMITED
+                  ZONE SQUARE REAL ESTATE LIMITED
                 </h4>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400">
                   Head Office: Mirpur DOHS / Pallabi, Dhaka · Regional: Salma Centre, Chattogram
@@ -791,7 +791,7 @@ export const DoubleProfitView: React.FC<DoubleProfitViewProps> = ({
                   <strong>বিনিয়োগকারী (First Party / Investor):</strong> {deedPlan.memberName} (ID: {deedPlan.memberId})
                 </p>
                 <p>
-                  <strong>কোম্পানি (Second Party):</strong> সিটি জোন স্কয়ার রিয়েল এস্টেট লিমিটেড (ব্যবস্থাপনা পরিচালক ও চেয়ারম্যান কর্তৃক স্বাক্ষরিত)।
+                  <strong>কোম্পানি (Second Party):</strong> জোন স্কয়ার রিয়েল এস্টেট লিমিটেড (ব্যবস্থাপনা পরিচালক ও চেয়ারম্যান কর্তৃক স্বাক্ষরিত)।
                 </p>
                 <p>
                   <strong>বিনিয়োগকৃত মূলধন (Capital Invested):</strong> ৳{deedPlan.principalAmount.toLocaleString()} টাকা।
@@ -832,7 +832,7 @@ export const DoubleProfitView: React.FC<DoubleProfitViewProps> = ({
                 <div>
                   <div className="h-10 border-b border-dashed border-slate-400 mx-8" />
                   <span className="font-bold text-amber-600 dark:text-amber-400 block mt-1">Authorized Signatory</span>
-                  <span className="text-[10px] text-slate-500">City Zone Square Corporate Seal</span>
+                  <span className="text-[10px] text-slate-500">ZONE SQUARE Corporate Seal</span>
                 </div>
               </div>
 
